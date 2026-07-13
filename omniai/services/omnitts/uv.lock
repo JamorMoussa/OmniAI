@@ -639,11 +639,17 @@ name = "omnitts-api"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "fastapi" },
     { name = "omnitts" },
+    { name = "uvicorn" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "omnitts", git = "https://github.com/JamorMoussa/OmniTTS.git" }]
+requires-dist = [
+    { name = "fastapi", specifier = ">=0.139.0" },
+    { name = "omnitts", git = "https://github.com/JamorMoussa/OmniTTS.git" },
+    { name = "uvicorn", specifier = ">=0.51.0" },
+]
 
 [[package]]
 name = "onnxruntime"

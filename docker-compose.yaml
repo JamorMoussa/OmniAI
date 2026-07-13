@@ -1,0 +1,54 @@
+services:
+  traefik:
+    image: traefik:v3
+    container_name: traefik
+
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--api.insecure=true"
+
+    ports:
+      - "80:80"
+      - "8080:8080"
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+    networks:
+      - omniai-network
+
+    restart: unless-stopped
+
+  omnitts:
+    build:
+      context: ./omniai/services/omnitts
+      dockerfile: Dockerfile
+
+    expose:
+      - "8000"
+
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+
+    labels:
+      - "traefik.enable=true"
+
+      # Route every /v1/audio request to OmniTTS
+      - "traefik.http.routers.omnitts.rule=PathPrefix(`/v1/audio`)"
+      - "traefik.http.routers.omnitts.entrypoints=web"
+      - "traefik.http.routers.omnitts.service=omnitts"
+
+      # Internal container port
+      - "traefik.http.services.omnitts.loadbalancer.server.port=8000"
+
+    networks:
+      - omniai-network
+
+    restart: unless-stopped
+
+networks:
+  omniai-network:
+    name: omniai-network

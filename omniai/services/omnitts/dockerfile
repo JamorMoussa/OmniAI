@@ -12,6 +12,8 @@ RUN apt-get update \
         ca-certificates \
         build-essential \
         portaudio19-dev \
+        espeak-ng \
+        libespeak-ng1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install uv without pip

@@ -21,9 +21,9 @@ services:
 
     restart: unless-stopped
 
-  omnitts:
+  speech:
     build:
-      context: ./omniai/services/omnitts
+      context: ./omniai/services/speech
       dockerfile: Dockerfile
 
     expose:
@@ -32,20 +32,21 @@ services:
     environment:
       PYTHONDONTWRITEBYTECODE: "1"
       PYTHONUNBUFFERED: "1"
+      OMNIAI_HOME: /root/.omniai/models
 
     labels:
       - "traefik.enable=true"
 
       # Route every /v1/audio request to OmniTTS
-      - "traefik.http.routers.omnitts.rule=PathPrefix(`/v1/audio`)"
-      - "traefik.http.routers.omnitts.entrypoints=web"
-      - "traefik.http.routers.omnitts.service=omnitts"
+      - "traefik.http.routers.speech.rule=PathPrefix(`/v1/audio`)"
+      - "traefik.http.routers.speech.entrypoints=web"
+      - "traefik.http.routers.speech.service=speech"
 
       # Internal container port
-      - "traefik.http.services.omnitts.loadbalancer.server.port=8000"
+      - "traefik.http.services.speech.loadbalancer.server.port=8000"
 
     volumes:
-      - /home/moussa/coding/omniai-dev/OmniAI/models:/models
+      - /home/moussa/coding/omniai-dev/OmniAI/models:/root/.omniai/models
 
     networks:
       - omniai-network

@@ -1,8 +1,8 @@
-from fastapi import FastAPI, APIRouter, Request
+from fastapi import FastAPI, APIRouter, Request, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from omnitts import KokoroTTS, Manifest
+from runtime import ModelRuntimeManager, get_runtime, lifespan
     
 
 class SpeechRequest(BaseModel):
@@ -11,18 +11,19 @@ class SpeechRequest(BaseModel):
     voice: str
     # speed: int
 
-tts = FastAPI()
+speech_app = FastAPI(lifespan=lifespan)
 
 router = APIRouter(prefix="/v1/audio")
-tts.include_router(router=router)
-
-speech_model = KokoroTTS.load(manifest=Manifest.load("/models/kokoro"))
+speech_app.include_router(router=router)
 
 
 @router.post("/speech")
 async def speech(
-    request: SpeechRequest
+    request: SpeechRequest, runtime: ModelRuntimeManager = Depends(get_runtime)
 ):  
+
+    speech_model = runtime.get(name=request.model)
+
     audio_streams = speech_model.create_stream(
         text= request.input, voice=request.voice
     )
@@ -34,8 +35,10 @@ async def speech(
 
 @router.get("/voices")
 def voices(
-    request: Request
+    model: str, runtime: ModelRuntimeManager = Depends(get_runtime)
 ):
+    speech_model = runtime.get(name=model)
+
     return {
         "voices": speech_model.voices()
     }

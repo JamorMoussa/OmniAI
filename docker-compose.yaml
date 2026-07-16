@@ -44,6 +44,9 @@ services:
       # Internal container port
       - "traefik.http.services.omnitts.loadbalancer.server.port=8000"
 
+    volumes:
+      - /home/moussa/coding/omniai-dev/OmniAI/models:/models
+
     networks:
       - omniai-network
 

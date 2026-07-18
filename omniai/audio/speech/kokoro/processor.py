@@ -150,7 +150,7 @@ class KokoroProcessor(OmniAIBaseProcessor):
         self, 
         text: str,
         voice: str,
-        max_chars: int = 400
+        max_chars: int = 150
     ):
 
         try:

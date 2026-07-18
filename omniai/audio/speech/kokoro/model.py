@@ -1,5 +1,4 @@
-from functools import reduce
-from typing import Self
+from typing import Self, Generator
 
 from ..base import SpeechModel
 from omniai.core import Manifest
@@ -44,14 +43,13 @@ class Kokoro(SpeechModel):
         self, 
         text: str,
         voice: str = "af_heart"
-    ):
-        audio_map = map(
+    ) -> Generator:
+        
+        yield from map(
             lambda inputs: (
                 AudioOutput(audio=self.backend.run(inputs=inputs.asdict()))
             ), self.processor.process(text=text, voice=voice)
         )
-
-        return audio_map
     
     def create(
         self,
@@ -59,14 +57,9 @@ class Kokoro(SpeechModel):
         voice: str = "af_heart"
     ) -> AudioOutput:
 
-        audio_map = map(
-            lambda inputs: (
-                AudioOutput(audio=self.backend.run(inputs=inputs.asdict()))
-            ), self.processor.process(text=text, voice=voice)
-        )
+        output = AudioOutput()
 
-        return reduce(
-            lambda audio1, audio2: (
-                audio1.add(audio2)
-            ), audio_map
-        )
+        for chunk in self.create_stream(text=text, voice=voice):
+            output.add(chunk)
+
+        return output

@@ -74,7 +74,7 @@ class AudioOutput(BaseOutput):
     )
     sample_rate: int = 24_000
 
-    def add(self, output: Self) -> None:
+    def add(self, output: Self) -> Self:
         if self.sample_rate != output.sample_rate:
             raise ValueError(
                 f"Sample-rate mismatch: "
@@ -87,6 +87,8 @@ class AudioOutput(BaseOutput):
                 output.audio.reshape(-1),
             )
         )
+
+        return self
 
     def save(self, path: str) -> None:
         sf.write(path, self.audio, self.sample_rate)

@@ -16,5 +16,6 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "openai>=2.46.0",
     "ruff>=0.15.22",
 ]

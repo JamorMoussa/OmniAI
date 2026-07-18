@@ -1,8 +1,8 @@
-from fastapi import FastAPI, APIRouter, Request, Depends
 from fastapi.responses import StreamingResponse
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from runtime import ModelRuntimeManager, get_runtime, lifespan
+from omniai.core import ModelRuntimeManager, get_runtime
     
 
 class SpeechRequest(BaseModel):
@@ -11,18 +11,15 @@ class SpeechRequest(BaseModel):
     voice: str
     # speed: int
 
-speech_app = FastAPI(lifespan=lifespan)
 
-router = APIRouter(prefix="/v1/audio")
-speech_app.include_router(router=router)
+speech_router = APIRouter()
 
-
-@router.post("/speech")
+@speech_router.post("/speech")
 async def speech(
     request: SpeechRequest, runtime: ModelRuntimeManager = Depends(get_runtime)
 ):  
 
-    speech_model = runtime.get(name=request.model)
+    speech_model = runtime.get(model_id=request.model)
 
     audio_streams = speech_model.create_stream(
         text= request.input, voice=request.voice
@@ -33,11 +30,11 @@ async def speech(
         media_type="audio/wav",
     )
 
-@router.get("/voices")
+@speech_router.get("/voices")
 def voices(
     model: str, runtime: ModelRuntimeManager = Depends(get_runtime)
 ):
-    speech_model = runtime.get(name=model)
+    speech_model = runtime.get(model_id=model)
 
     return {
         "voices": speech_model.voices()

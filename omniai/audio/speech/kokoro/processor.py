@@ -178,6 +178,6 @@ class KokoroProcessor(OmniAIBaseProcessor):
             yield KokoroInput(
                 tokens = np.array([[0, *tokens, 0]], dtype=np.int64),
                 style = np.array(voice_embedding[len(tokens)], dtype=np.float32),
-                speed = np.array([1.2], dtype=np.float32),
+                speed = np.array([1.3], dtype=np.float32),
                 text = source_text,
             )

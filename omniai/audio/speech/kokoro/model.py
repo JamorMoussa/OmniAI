@@ -47,7 +47,10 @@ class Kokoro(SpeechModel):
         
         yield from map(
             lambda inputs: (
-                AudioOutput(audio=self.backend.run(inputs=inputs.asdict()))
+                AudioOutput(
+                    audio=self.backend.run(inputs=inputs.asdict()),
+                    text=inputs.text,
+                )
             ), self.processor.process(text=text, voice=voice)
         )
     

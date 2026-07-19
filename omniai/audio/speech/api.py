@@ -21,7 +21,9 @@ speech_router = APIRouter()
 def frame_audio_chunks(audio_streams):
     for chunk in audio_streams:
         wav = chunk.as_bytes()
-        yield struct.pack(">I", len(wav)) + wav
+        text = chunk.text.encode("utf-8")
+        payload = struct.pack(">I", len(text)) + text + wav
+        yield struct.pack(">I", len(payload)) + payload
 
 @speech_router.post("/speech")
 async def speech(
@@ -56,6 +58,7 @@ def speech_stream(
         headers={
             "Cache-Control": "no-cache, no-transform",
             "X-Content-Type-Options": "nosniff",
+            "X-OmniAI-Stream-Format": "uint32-frame-length,uint32-text-length,utf8-text,wav",
         },
     )
 

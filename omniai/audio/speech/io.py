@@ -73,6 +73,7 @@ class AudioOutput(BaseOutput):
         default_factory=lambda: np.empty(0, dtype=np.float32)
     )
     sample_rate: int = 24_000
+    text: str = ""
 
     def add(self, output: Self) -> Self:
         if self.sample_rate != output.sample_rate:

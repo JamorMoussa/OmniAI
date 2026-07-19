@@ -14,6 +14,12 @@ class KokoroInput(SpeechModelInput):
     tokens: np.ndarray
     style: np.ndarray
     speed: np.ndarray
+    text: str
+
+    def asdict(self):
+        inputs = super().asdict()
+        inputs.pop("text")
+        return inputs
 
 
 @dataclass
@@ -164,6 +170,7 @@ class KokoroProcessor(OmniAIBaseProcessor):
 
         for chunk in chunks:
 
+            source_text = chunk
             chunk = self._phonemize(text=chunk)
 
             tokens = self._tokenize(chunk, vocab=self.vocab)
@@ -172,4 +179,5 @@ class KokoroProcessor(OmniAIBaseProcessor):
                 tokens = np.array([[0, *tokens, 0]], dtype=np.int64),
                 style = np.array(voice_embedding[len(tokens)], dtype=np.float32),
                 speed = np.array([1.2], dtype=np.float32),
+                text = source_text,
             )
